@@ -18,7 +18,8 @@ const app = express();
 
 
 const allowedOrigins = [
-  "https://ems-portal-blond.vercel.app", 
+  "https://ems-frontend-11wo.onrender.com/login",
+  // "https://ems-portal-blond.vercel.app", 
   "http://localhost:5173",               
   "http://localhost:3000"
 ];
