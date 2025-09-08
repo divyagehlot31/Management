@@ -14,9 +14,16 @@ dotenv.config();
 connectToDatabase()
 
 const app = express();
-// app.use(cors());
+
+// Updated CORS configuration with correct URLs
 app.use(cors({
-  origin: ["https://your-vercel-app.vercel.app"], // <-- yaha apna Vercel URL daalo
+  origin: [
+    "https://ems-portal-beryl.vercel.app",           // Your actual Vercel URL
+    "https://ems-portal-git-main-divya-gehlots-projects.vercel.app", // Git branch URL
+    "https://ems-portal-k8l5fnouq-divya-gehlots-projects.vercel.app", // Preview URL
+    "http://localhost:3000",                          // For local development
+    "http://localhost:5173"                           // For Vite dev server
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
@@ -26,14 +33,15 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRouter)
 app.use("/api/departments", departmentRoutes);
-
-app.use("/api/employees", employeeRoutes); // Add this
+app.use("/api/employees", employeeRoutes);
 app.use("/api/salaries", salaryRoutes);
 app.use("/api/paysalary", paySalaryRoutes);
 app.use("/api/leaves", leaveRoutes);
 
-
-
+// Add a test route to verify server is working
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Server is working!', timestamp: new Date().toISOString() });
+});
 
 console.log("Server starting...");
 
