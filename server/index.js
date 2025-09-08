@@ -1,4 +1,4 @@
-// index.js (or server.js)
+// index.js
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -23,14 +23,27 @@ const allowedOrigins = [
   "http://localhost:5173"
 ];
 
-// CORS
+// CORS middleware with dynamic origin check
 app.use(cors({
-  origin: allowedOrigins,
+  origin: function(origin, callback) {
+    // allow requests with no origin (like Postman or curl)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = `CORS policy: The origin ${origin} is not allowed.`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true,
   methods: ["GET","POST","PUT","DELETE","OPTIONS"],
   allowedHeaders: ["Content-Type","Authorization"]
 }));
 
+// Preflight handler for all routes
+app.options("*", cors());
+
+// JSON body parser
 app.use(express.json());
 
 // Routes
@@ -41,12 +54,14 @@ app.use("/api/salaries", salaryRoutes);
 app.use("/api/paysalary", paySalaryRoutes);
 app.use("/api/leaves", leaveRoutes);
 
-// Test
-app.get('/api/test', (req,res) => res.json({message:"Server is working!", timestamp:new Date().toISOString()}));
-app.get('/', (req,res) => res.send("Server is running!"));
+// Test routes
+app.get('/api/test', (req, res) => {
+  res.json({ message: "Server is working!", timestamp: new Date().toISOString() });
+});
+app.get('/', (req, res) => res.send("Server is running!"));
 
-// Start server after DB connects
-const PORT = process.env.PORT 
+// Start server after MongoDB connects
+const PORT = process.env.PORT || 3000;
 
 connectToDatabase()
   .then(() => {
