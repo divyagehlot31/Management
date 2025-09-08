@@ -12,9 +12,6 @@ import leaveRoutes from "./routes/leaveRoutes.js";
 
 dotenv.config();
 
-// Connect to database
-connectToDatabase();
-
 const app = express();
 
 // Allowed origins for frontend
@@ -35,14 +32,9 @@ app.use(cors({
 }));
 
 // Preflight handler for all routes
-app.options("*", cors({
-  origin: allowedOrigins,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+app.options("*", cors());
 
-// JSON body parser
+// JSON parser
 app.use(express.json());
 
 // Routes
@@ -59,8 +51,14 @@ app.get('/api/test', (req, res) => {
 });
 app.get('/', (req, res) => res.send('Server is running!'));
 
-// Start server on Railway-assigned port
+// Start server only after DB connects
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+connectToDatabase()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`✅ Server running on port ${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error("❌ Failed to connect to MongoDB:", err);
+  });
