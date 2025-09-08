@@ -1,4 +1,3 @@
-// routes/leaveRoutes.js
 import express from "express";
 import {
   applyLeave,
@@ -7,16 +6,18 @@ import {
   updateLeaveStatus,
   getLeaveStats
 } from "../controllers/leaveController.js";
+import { verifyUser, isAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
+// ✅ FIXED: Add proper middleware to all routes
 // Employee routes
-router.post("/apply", applyLeave);
-router.get("/my-leaves", getMyLeaves);
+router.post("/apply", verifyUser, applyLeave);
+router.get("/my-leaves", verifyUser, getMyLeaves);
 
 // Admin routes
-router.get("/all", getAllLeaves);
-router.put("/update/:leaveId", updateLeaveStatus);
-router.get("/stats", getLeaveStats);
+router.get("/all", verifyUser, isAdmin, getAllLeaves);
+router.put("/update/:leaveId", verifyUser, isAdmin, updateLeaveStatus);
+router.get("/stats", verifyUser, isAdmin, getLeaveStats);
 
 export default router;
