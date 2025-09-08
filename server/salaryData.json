@@ -1,0 +1,18 @@
+[
+  {
+    "employeeId": "EMP001",
+    "salary": 40000,
+    "allowance": 5000,
+    "deduction": 2000,
+    "total": 43000,
+    "payDate": "01-09-2025"
+  },
+  {
+    "employeeId": "EMP002",
+    "salary": 35000,
+    "allowance": 4000,
+    "deduction": 1500,
+    "total": 37500,
+    "payDate": "01-09-2025"
+  }
+]
