@@ -15,13 +15,25 @@ dotenv.config();
 const app = express();
 
 // Allowed frontend URLs
+
+
 const allowedOrigins = [
-  "https://ems-portal-beryl.vercel.app",
-  "https://ems-portal-git-main-divya-gehlots-projects.vercel.app",
-  "https://ems-portal-k8l5fnouq-divya-gehlots-projects.vercel.app",
-  "http://localhost:3000",
-  "http://localhost:5173"
+  "https://ems-portal-blond.vercel.app", // ✅ your Vercel frontend
+  "http://localhost:5173",               // ✅ local dev (optional)
+  "http://localhost:3000"
 ];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS not allowed for this origin"));
+    }
+  },
+  credentials: true,
+}));
+
 
 // CORS middleware with dynamic origin check
 app.use(cors({
