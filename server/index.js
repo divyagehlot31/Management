@@ -46,7 +46,7 @@ app.get('/api/test', (req,res) => res.json({message:"Server is working!", timest
 app.get('/', (req,res) => res.send("Server is running!"));
 
 // Start server after DB connects
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT 
 
 connectToDatabase()
   .then(() => {
