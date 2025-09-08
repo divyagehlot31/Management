@@ -1,4 +1,4 @@
-// server.js
+// index.js (or server.js)
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -14,7 +14,7 @@ dotenv.config();
 
 const app = express();
 
-// Allowed origins for frontend
+// Allowed frontend URLs
 const allowedOrigins = [
   "https://ems-portal-beryl.vercel.app",
   "https://ems-portal-git-main-divya-gehlots-projects.vercel.app",
@@ -23,18 +23,14 @@ const allowedOrigins = [
   "http://localhost:5173"
 ];
 
-// CORS middleware
+// CORS
 app.use(cors({
   origin: allowedOrigins,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"]
+  methods: ["GET","POST","PUT","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type","Authorization"]
 }));
 
-// Preflight handler for all routes
-app.options("*", cors());
-
-// JSON parser
 app.use(express.json());
 
 // Routes
@@ -45,14 +41,13 @@ app.use("/api/salaries", salaryRoutes);
 app.use("/api/paysalary", paySalaryRoutes);
 app.use("/api/leaves", leaveRoutes);
 
-// Test routes
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'Server is working!', timestamp: new Date().toISOString() });
-});
-app.get('/', (req, res) => res.send('Server is running!'));
+// Test
+app.get('/api/test', (req,res) => res.json({message:"Server is working!", timestamp:new Date().toISOString()}));
+app.get('/', (req,res) => res.send("Server is running!"));
 
-// Start server only after DB connects
+// Start server after DB connects
 const PORT = process.env.PORT || 3000;
+
 connectToDatabase()
   .then(() => {
     app.listen(PORT, () => {
@@ -61,4 +56,5 @@ connectToDatabase()
   })
   .catch(err => {
     console.error("❌ Failed to connect to MongoDB:", err);
+    process.exit(1);
   });
