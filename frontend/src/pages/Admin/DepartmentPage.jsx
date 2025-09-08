@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-// import axios from "axios";
-import API from "../../utils/api";
+import axios from "axios";
 import { useAuth } from "../../context/authContext";
 import AddDepartmentModal from "../../components/AddDepartmentModal";
 import ViewDepartmentModal from "../../components/ViewDepartmentModal";
@@ -27,7 +26,7 @@ const DepartmentPage = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await API.get("/api/departments", {
+      const response = await axios.get("http://localhost:5000/api/departments", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -89,7 +88,7 @@ const DepartmentPage = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await API.delete(`/api/departments/${id}`, {
+      const response = await axios.delete(`http://localhost:5000/api/departments/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

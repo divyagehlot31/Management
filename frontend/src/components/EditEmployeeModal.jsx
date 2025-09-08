@@ -1,7 +1,6 @@
 // components/EditEmployeeModal.js
 import React, { useState, useEffect } from "react";
-// import axios from "axios";
-import API from "../utils/api";
+import axios from "axios";
 
 const EditEmployeeModal = ({ employee, isOpen, onClose, onEmployeeUpdated }) => {
   const [formData, setFormData] = useState({
@@ -60,7 +59,7 @@ useEffect(() => {
     try {
       setDepartmentsLoading(true);
       const token = localStorage.getItem("token");
-      const response = await API.get("/api/departments", {
+      const response = await axios.get("http://localhost:5000/api/departments", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -104,8 +103,8 @@ useEffect(() => {
 
       console.log("Sending update data:", updateData);
 
-      const response = await API.put(
-        `/api/employees/${employee._id}`,
+      const response = await axios.put(
+        `http://localhost:5000/api/employees/${employee._id}`,
         updateData,
         {
           headers: {

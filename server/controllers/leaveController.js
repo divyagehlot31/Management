@@ -36,10 +36,6 @@ export const applyLeave = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      return res.status(400).json({ success: false, error: "Invalid date format" });
-    }
-
     if (start < today) {
       return res.status(400).json({ success: false, error: "Start date cannot be in the past" });
     }
@@ -48,17 +44,12 @@ export const applyLeave = async (req, res) => {
       return res.status(400).json({ success: false, error: "End date cannot be before start date" });
     }
 
-    // Calculate totalDays manually as a backup
-    const timeDiff = end.getTime() - start.getTime();
-    const totalDays = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
-
     const leave = new Leave({
       employee: user._id,
       leaveType,
       startDate: start,
       endDate: end,
       reason: reason.trim(),
-      totalDays, // Explicitly set totalDays
     });
 
     await leave.save();

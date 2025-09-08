@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-// import axios from "axios";
+import axios from "axios";
 import { useAuth } from "../../context/authContext";
-import API from "../../utils/api";
 
 const SettingsPage = () => {
   const { user } = useAuth();
@@ -86,8 +85,8 @@ const SettingsPage = () => {
       setPasswordError("");
       
       const token = localStorage.getItem("token");
-      const response = await API.put(
-        "/api/auth/change-password",
+      const response = await axios.put(
+        "http://localhost:5000/api/auth/change-password",
         {
           oldPassword: passwordData.oldPassword,
           newPassword: passwordData.newPassword
@@ -137,8 +136,8 @@ const SettingsPage = () => {
       setProfileError("");
       
       const token = localStorage.getItem("token");
-      const response = await API.put(
-        "/api/auth/update-profile",
+      const response = await axios.put(
+        "http://localhost:5000/api/auth/update-profile",
         profileData,
         {
           headers: {

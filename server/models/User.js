@@ -1,3 +1,4 @@
+// models/User.js
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
@@ -20,12 +21,13 @@ const userSchema = new mongoose.Schema(
 
 // Generate employee ID before saving
 userSchema.pre("save", async function (next) {
+  // Only generate ID for new employee records without existing employeeId
   if (this.isNew && this.role === "employee" && !this.employeeId) {
     try {
       const count = await mongoose.model("User").countDocuments({ role: "employee" });
       this.employeeId = `EMP${String(count + 1).padStart(3, "0")}`;
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
   next();

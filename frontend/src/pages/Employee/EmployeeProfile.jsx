@@ -1,7 +1,6 @@
 // src/pages/employee/EmployeeProfile.jsx
 import React, { useState, useEffect } from "react";
-// import axios from "axios";
-import API from "../../utils/api";
+import axios from "axios";
 import { useAuth } from "../../context/authContext";
 import { User, Mail, Phone, Calendar, Building, Key, Edit, Save, X, RefreshCw } from "lucide-react";
 
@@ -35,12 +34,19 @@ const EmployeeProfile = () => {
     }
   }, [user]);
 
-  // ✅ NEW: Function to refresh user data from server
+  // ✅ FIXED: Function to refresh user data from server
   const refreshUserData = async () => {
     try {
       setRefreshing(true);
+      setError(null);
       const token = localStorage.getItem("token");
-      const res = await API.get("/api/auth/profile", {
+      
+      if (!token) {
+        setError("No authentication token found");
+        return;
+      }
+
+      const res = await axios.get("http://localhost:5000/api/auth/profile", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -48,10 +54,17 @@ const EmployeeProfile = () => {
         // Update the auth context with fresh user data
         login(token, res.data.user);
         setSuccess("Profile data refreshed!");
+        
+        // Update local profile data state
+        setProfileData({
+          name: res.data.user.name || "",
+          email: res.data.user.email || "",
+          phone: res.data.user.phone || "",
+        });
       }
     } catch (err) {
       console.error("Error refreshing user data:", err);
-      setError("Failed to refresh profile data");
+      setError(err.response?.data?.error || "Failed to refresh profile data");
     } finally {
       setRefreshing(false);
     }
@@ -78,8 +91,8 @@ const EmployeeProfile = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await API.put(
-        "/api/auth/update-profile",
+      const res = await axios.put(
+        "http://localhost:5000/api/auth/update-profile",
         profileData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -118,8 +131,8 @@ const EmployeeProfile = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await API.put(
-        "/api/auth/change-password",
+      const res = await axios.put(
+        "http://localhost:5000/api/auth/change-password",
         {
           oldPassword: passwordData.oldPassword,
           newPassword: passwordData.newPassword,
@@ -165,7 +178,7 @@ const EmployeeProfile = () => {
           <h2 className="text-2xl font-bold text-gray-800">Employee Profile</h2>
         </div>
         
-        {/* ✅ NEW: Refresh button */}
+        {/* ✅ FIXED: Refresh button */}
         <button
           onClick={refreshUserData}
           disabled={refreshing}

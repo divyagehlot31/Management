@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-// import axios from "axios";
-import API from "../utils/api";
+import axios from "axios";
 
 const AuthContext = createContext();
 
@@ -29,7 +28,7 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      const res = await API.get("/api/auth/verify", {
+      const res = await axios.get("http://localhost:5000/api/auth/verify", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -45,6 +44,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    // ✅ agar refresh hoga to localStorage se user reload karo
     const savedUser = localStorage.getItem("user");
     if (savedUser) setUser(JSON.parse(savedUser));
 

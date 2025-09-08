@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-// import axios from "axios";
-import API from "../../utils/api";
+import axios from "axios";
 
 const SalaryPage = () => {
   const [salaries, setSalaries] = useState([]);
@@ -8,7 +7,7 @@ const SalaryPage = () => {
   const [filteredSalaries, setFilteredSalaries] = useState([]);
 
   useEffect(() => {
-    API.get("/api/salaries")
+    axios.get("http://localhost:5000/api/salaries")
       .then((res) => {
         setSalaries(res.data);
         setFilteredSalaries(res.data);

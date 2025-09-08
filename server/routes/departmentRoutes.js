@@ -14,18 +14,14 @@ import { verifyUser, isAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// ✅ IMPORTANT: Public routes MUST come BEFORE parameterized routes
+// ✅ PUBLIC ROUTE FIRST - No authentication needed
 router.get("/public/list", getPublicDepartments);
 
-// ✅ Other specific routes before /:id
-router.get("/available-heads", verifyUser, getAvailableHeads);
-
-// ✅ Admin / Authenticated routes
+// ✅ PROTECTED ROUTES - Authentication required
 router.get("/", verifyUser, getDepartments); 
-router.post("/", verifyUser, isAdmin, createDepartment);
-
-// ✅ Parameterized routes LAST
+router.get("/available-heads", verifyUser, getAvailableHeads);
 router.get("/:id", verifyUser, getDepartmentById);
+router.post("/", verifyUser, isAdmin, createDepartment);
 router.put("/:id", verifyUser, isAdmin, updateDepartment);
 router.delete("/:id", verifyUser, isAdmin, deleteDepartment);
 

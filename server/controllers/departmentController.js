@@ -4,11 +4,10 @@ import User from "../models/User.js";
 
 // Add this function to your departmentController.js
 
-
 // Get departments for public registration (no auth required)
 export const getPublicDepartments = async (req, res) => {
   try {
-    const departments = await Department.find({ isActive: true })
+    const departments = await Department.find({ isActive: { $ne: false } })
       .select("name description")
       .sort({ name: 1 });
 
@@ -25,7 +24,6 @@ export const getPublicDepartments = async (req, res) => {
     });
   }
 };
-
 
 // Get all departments
 export const getDepartments = async (req, res) => {
@@ -154,12 +152,6 @@ export const updateDepartment = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    // Ensure status mapping
-    if (updates.status) {
-      updates.isActive = updates.status === "active";
-      delete updates.status;
-    }
-
     if (updates.name) {
       const existingDepartment = await Department.findOne({
         name: { $regex: new RegExp(`^${updates.name}$`, "i") },
@@ -170,6 +162,16 @@ export const updateDepartment = async (req, res) => {
         return res.status(400).json({
           success: false,
           error: "Department name already exists",
+        });
+      }
+    }
+
+    if (updates.headOfDepartment) {
+      const user = await User.findById(updates.headOfDepartment);
+      if (!user) {
+        return res.status(400).json({
+          success: false,
+          error: "Selected head of department not found",
         });
       }
     }
@@ -199,7 +201,6 @@ export const updateDepartment = async (req, res) => {
     });
   }
 };
-
 
 // Delete department
 export const deleteDepartment = async (req, res) => {
