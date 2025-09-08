@@ -18,8 +18,8 @@ const app = express();
 
 
 const allowedOrigins = [
-  "https://ems-portal-blond.vercel.app", // ✅ your Vercel frontend
-  "http://localhost:5173",               // ✅ local dev (optional)
+  "https://ems-portal-blond.vercel.app", 
+  "http://localhost:5173",               
   "http://localhost:3000"
 ];
 
