@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import API from "../utils/api";
+// import axios from "axios";
 
 const ViewDepartmentModal = ({ isOpen, onClose, departmentId }) => {
   const [department, setDepartment] = useState(null);
@@ -18,8 +19,8 @@ const ViewDepartmentModal = ({ isOpen, onClose, departmentId }) => {
       setError(null);
       
       const token = localStorage.getItem("token");
-      const response = await axios.get(
-        `http://localhost:5000/api/departments/${departmentId}`,
+      const response = await API.get(
+        `/api/departments/${departmentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -28,7 +29,6 @@ const ViewDepartmentModal = ({ isOpen, onClose, departmentId }) => {
       );
 
       if (response.data.success) {
-        // ✅ FIXED: Use correct response structure
         setDepartment(response.data.department);
         console.log("Department details loaded:", response.data.department);
       }

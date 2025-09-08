@@ -1,6 +1,7 @@
 // src/pages/employee/ApplyLeave.jsx
 import React, { useState } from "react";
-import axios from "axios";
+// import axios from "axios";
+import API from "../../utils/api";
 import { useAuth } from "../../context/authContext";
 import { Calendar, Clock, FileText, Send } from "lucide-react";
 
@@ -49,8 +50,8 @@ const ApplyLeave = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post(
-        "http://localhost:5000/api/leaves/apply",
+      const res = await API.post(
+        "/api/leaves/apply",
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },

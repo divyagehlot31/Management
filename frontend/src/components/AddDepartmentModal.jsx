@@ -1,6 +1,7 @@
 // components/AddDepartmentModal.js
 import React, { useState } from "react";
-import axios from "axios";
+// import axios from "axios";
+import API from "../utils/api";
 
 const AddDepartmentModal = ({ isOpen, onClose, onDepartmentAdded }) => {
   const [formData, setFormData] = useState({
@@ -33,8 +34,10 @@ const AddDepartmentModal = ({ isOpen, onClose, onDepartmentAdded }) => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post(
-        "http://localhost:5000/api/departments",
+      const response = await API.post(
+                "/api/departments",
+
+        // "http://localhost:5000/api/departments",
         formData,
         {
           headers: {

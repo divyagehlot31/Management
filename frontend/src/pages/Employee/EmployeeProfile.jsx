@@ -1,6 +1,7 @@
 // src/pages/employee/EmployeeProfile.jsx
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
+import API from "../../utils/api";
 import { useAuth } from "../../context/authContext";
 import { User, Mail, Phone, Calendar, Building, Key, Edit, Save, X, RefreshCw } from "lucide-react";
 
@@ -39,7 +40,7 @@ const EmployeeProfile = () => {
     try {
       setRefreshing(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/auth/profile", {
+      const res = await API.get("/api/auth/profile", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -77,8 +78,8 @@ const EmployeeProfile = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.put(
-        "http://localhost:5000/api/auth/update-profile",
+      const res = await API.put(
+        "/api/auth/update-profile",
         profileData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -117,8 +118,8 @@ const EmployeeProfile = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.put(
-        "http://localhost:5000/api/auth/change-password",
+      const res = await API.put(
+        "/api/auth/change-password",
         {
           oldPassword: passwordData.oldPassword,
           newPassword: passwordData.newPassword,

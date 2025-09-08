@@ -1,6 +1,7 @@
 // src/pages/PaySalaryPage.js
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+// import axios from "axios";
+import API from "../../utils/api";
 
 const PaySalaryPage = () => {
   const [employees, setEmployees] = useState([]);
@@ -10,7 +11,7 @@ const PaySalaryPage = () => {
     allowance: 0,
     deduction: 0,
     total: 0,
-    payDate: new Date().toISOString().split("T")[0], // default today
+    payDate: new Date().toISOString().split("T")[0], 
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -18,8 +19,8 @@ const PaySalaryPage = () => {
   // Fetch employees
 useEffect(() => {
   const token = localStorage.getItem("token");
-  axios
-    .get("http://localhost:5000/api/employees", {
+  API
+    .get("/api/employees", {
       headers: { Authorization: `Bearer ${token}` },
     })
     .then((res) => setEmployees(res.data.employees))
@@ -27,7 +28,6 @@ useEffect(() => {
 }, []);
 
 
-  // Update salary automatically if employee changes
   useEffect(() => {
     if (selectedEmployee) {
       setFormData((prev) => ({
@@ -40,7 +40,6 @@ useEffect(() => {
     }
   }, [selectedEmployee]);
 
-  // Update total when salary/allowance/deduction changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     const val = Number(value) || 0;
@@ -68,7 +67,7 @@ useEffect(() => {
     setMessage("");
 
     try {
-      await axios.post("http://localhost:5000/api/paysalary", {
+      await API.post("/api/paysalary", {
         employeeId: selectedEmployee._id,
         salary: formData.salary,
         allowance: formData.allowance,

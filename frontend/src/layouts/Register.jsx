@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/authContext";
+import API from "../utils/api";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ const Register = () => {
     const fetchDepartments = async () => {
       try {
         // ✅ FIXED: Use public departments endpoint
-        const res = await axios.get("http://localhost:5000/api/departments/public/list");
+        const res = await API.get("/api/departments/public/list");
         console.log("Departments response:", res.data); // Debug log
         
         // Handle both data and departments properties
@@ -50,7 +51,7 @@ const Register = () => {
     setError(null);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", {
+      const res = await API.post("/api/auth/register", {
         ...formData,
         role: "employee",
       });

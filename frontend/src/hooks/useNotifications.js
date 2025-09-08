@@ -1,6 +1,7 @@
 // src/hooks/useNotifications.js
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
+import API from '../utils/api';
 
 export const useNotifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -157,7 +158,7 @@ export const useNotifications = () => {
 const markNotificationAsRead = async (id) => {
   try {
     const token = localStorage.getItem('token');
-    await axios.put(`/api/notifications/${id}/read`, {}, {
+    await API.put(`/api/notifications/${id}/read`, {}, {
       headers: { Authorization: `Bearer ${token}` }
     });
   } catch (error) {
@@ -168,7 +169,7 @@ const markNotificationAsRead = async (id) => {
 const markAllNotificationsAsRead = async () => {
   try {
     const token = localStorage.getItem('token');
-    await axios.put('/api/notifications/mark-all-read', {}, {
+    await API.put('/api/notifications/mark-all-read', {}, {
       headers: { Authorization: `Bearer ${token}` }
     });
   } catch (error) {
@@ -179,7 +180,7 @@ const markAllNotificationsAsRead = async () => {
 const deleteNotification = async (id) => {
   try {
     const token = localStorage.getItem('token');
-    await axios.delete(`/api/notifications/${id}`, {
+    await API.delete(`/api/notifications/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
   } catch (error) {

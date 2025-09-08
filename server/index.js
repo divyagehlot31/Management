@@ -14,7 +14,13 @@ dotenv.config();
 connectToDatabase()
 
 const app = express();
-app.use(cors());
+// app.use(cors());
+app.use(cors({
+  origin: ["https://your-vercel-app.vercel.app"], // <-- yaha apna Vercel URL daalo
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // Routes

@@ -1,6 +1,7 @@
 // src/pages/admin/DashboardHome.jsx
 import React, { useEffect, useState } from "react"; 
-import axios from "axios";
+// import axios from "axios";
+import API from "../../utils/api";
 
 const DashboardHome = () => {
   const [departments, setDepartments] = useState([]);
@@ -17,7 +18,7 @@ const DashboardHome = () => {
   // Fetch departments
   const fetchDepartments = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/departments", {
+      const res = await API.get("/api/departments", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setDepartments(res.data.data || []);
@@ -29,7 +30,7 @@ const DashboardHome = () => {
   // Fetch total employees
   const fetchTotalEmployees = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/employees", {
+      const res = await API.get("/api/employees", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.data.success) {
@@ -43,7 +44,7 @@ const DashboardHome = () => {
   // Fetch leave stats
   const fetchLeaveStats = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/leaves/all", {
+      const res = await API.get("/api/leaves/all", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
