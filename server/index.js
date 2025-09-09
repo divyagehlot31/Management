@@ -15,7 +15,7 @@ connectToDatabase();
 
 const app = express();
 
-// ✅ CORS config
+// CORS config
 app.use(cors({
   origin: ["https://frontend-opze.onrender.com"], 
   methods: ["GET", "POST", "PUT", "DELETE"],
