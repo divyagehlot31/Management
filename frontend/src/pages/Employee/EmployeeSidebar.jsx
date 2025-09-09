@@ -1,7 +1,7 @@
 // src/components/EmployeeSidebar.jsx
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { User, Calendar, FileText, LogOut, Menu, X } from "lucide-react";
+import { User, Calendar, FileText, LogOut, Menu, X, Book } from "lucide-react";
 import { useAuth } from "../../context/authContext";
 
 const EmployeeSidebar = ({ isOpen, toggleSidebar }) => {
@@ -10,6 +10,8 @@ const EmployeeSidebar = ({ isOpen, toggleSidebar }) => {
 
   const menuItems = [
     { path: "/employee-dashboard/profile", label: "Profile", icon: User },
+        { path: "/employee-dashboard/task", label: "Task", icon: Book },
+
     { path: "/employee-dashboard/leave", label: "Leave Management", icon: Calendar },
     { path: "/employee-dashboard/leave-history", label: "Leave History", icon: FileText }
   ];

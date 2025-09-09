@@ -18,6 +18,8 @@ import ApplyLeave from "./pages/Employee/ApplyLeave";
 import LeaveHistory from "./pages/Employee/LeaveHistory";
 import ProtectedRoute from "./components/ProtectedRoute";
 import EmployeeProfile from "./pages/Employee/EmployeeProfile";
+import AdminTasks from "./pages/Admin/AdminTasks";
+import EmployeeTasks from "./pages/Employee/EmployeeTasks";
 
 function App() {
   return (
@@ -43,6 +45,8 @@ function App() {
           <Route path="employee" element={<EmployeePage />} />
           <Route path="salary" element={<SalaryPage />} />
           <Route path="leaves" element={<LeavePage />} />
+                    <Route path="task" element={<AdminTasks/>} />
+
           <Route path="department" element={<DepartmentPage />} />
                     <Route path="pay" element={<PaySalaryPage />} />
 
@@ -60,6 +64,8 @@ function App() {
         >
           <Route index element={<Navigate to="profile" />} />
           <Route path="profile" element={<EmployeeProfile />} />
+                    <Route path="task" element={<EmployeeTasks/>} />
+
  <Route path="leave" element={<ApplyLeave />} />
             <Route path="leave-history" element={<LeaveHistory />} />        </Route>
       </Routes>

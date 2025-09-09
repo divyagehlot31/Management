@@ -9,6 +9,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     { name: "Employee", path: "/admin-dashboard/employee" },
     { name: "Department", path: "/admin-dashboard/department" },
     { name: "Leaves", path: "/admin-dashboard/leaves" },
+        { name: "Task", path: "/admin-dashboard/task" },
+
     { name: "Salary History", path: "/admin-dashboard/salary" },
     { name: "Pay Employee", path: "/admin-dashboard/pay" },
     { name: "Settings", path: "/admin-dashboard/settings" },
