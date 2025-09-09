@@ -18,7 +18,7 @@ const EmployeeTasks = () => {
     try {
       setLoading(true);
       const query = statusFilter ? `?status=${statusFilter}` : "";
-      const res = await API.get(`/api/tasks${query}`, {
+      const res = await API.get(`/tasks${query}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTasks(res.data.tasks);
@@ -37,7 +37,7 @@ const EmployeeTasks = () => {
   // Update task status
   const handleStatusChange = async (taskId, newStatus) => {
     try {
-      const res = await API.put(`/api/tasks/${taskId}`, { status: newStatus }, {
+      const res = await API.put(`/tasks/${taskId}`, { status: newStatus }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTasks(tasks.map(task => task._id === taskId ? res.data.task : task));
@@ -51,7 +51,7 @@ const EmployeeTasks = () => {
   const handleAddComment = async (taskId) => {
     if (!commentText[taskId] || commentText[taskId].trim() === "") return;
     try {
-      const res = await API.post(`/api/tasks/${taskId}/comments`, { message: commentText[taskId] }, {
+      const res = await API.post(`/tasks/${taskId}/comments`, { message: commentText[taskId] }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTasks(tasks.map(task => task._id === taskId ? res.data.task : task));
@@ -66,7 +66,7 @@ const EmployeeTasks = () => {
   const handleSubmissionNote = async (taskId) => {
     if (!submissionNote[taskId] || submissionNote[taskId].trim() === "") return;
     try {
-      const res = await API.put(`/api/tasks/${taskId}`, { submissionNote: submissionNote[taskId] }, {
+      const res = await API.put(`/tasks/${taskId}`, { submissionNote: submissionNote[taskId] }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTasks(tasks.map(task => task._id === taskId ? res.data.task : task));
@@ -86,7 +86,7 @@ const EmployeeTasks = () => {
         formData.append("files", file);
       });
 
-      const res = await API.put(`/api/tasks/${taskId}`, formData, {
+      const res = await API.put(`/tasks/${taskId}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
