@@ -26,9 +26,6 @@ app.use("/api/salaries", salaryRoutes);
 app.use("/api/paysalary", paySalaryRoutes);
 app.use("/api/leaves", leaveRoutes);
 
-
-
-
 console.log("Server starting...");
 
 const PORT = process.env.PORT || 5000;
