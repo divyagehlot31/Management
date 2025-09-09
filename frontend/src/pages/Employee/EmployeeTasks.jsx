@@ -18,7 +18,7 @@ const EmployeeTasks = () => {
     try {
       setLoading(true);
       const query = statusFilter ? `?status=${statusFilter}` : "";
-      const res = await API.get(`/tasks${query}`, {
+      const res = await API.get(`/task${query}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTasks(res.data.tasks);

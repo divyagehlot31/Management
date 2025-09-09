@@ -58,7 +58,12 @@ const AdminTask = () => {
         if (value && key !== 'search') params[key] = value;
       });
 
-      const { data } = await API.get('/api/task', { params, ...axiosConfig });
+      const res = await API.get('/task', {
+  headers: { Authorization: `Bearer ${token}` },
+  params: statusFilter ? { status: statusFilter } : {}
+});
+
+      // const { data } = await API.get('/task', { params, ...axiosConfig });
 
       if (data.success) {
         let filteredTasks = data.tasks;
