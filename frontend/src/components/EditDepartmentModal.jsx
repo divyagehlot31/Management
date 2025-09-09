@@ -90,7 +90,7 @@ isActive: department.isActive !== false // default true
   name: formData.name,
   description: formData.description,
   headOfDepartment: formData.headOfDepartment || null,
-  isActive: formData.isActive,  // ✅ सही field
+  isActive: formData.isActive,  // 
 };
 
 

@@ -19,9 +19,7 @@ const DepartmentSelect = ({ value, onChange, className = "", disabled = false })
       
       // ✅ FIXED: Use the correct endpoint for departments
       const response = await axios.get(
-        "/api/departments", 
-
-        // "http://localhost:5000/api/departments", 
+        "http://localhost:5000/api/departments", 
         {
         headers: {
           Authorization: `Bearer ${token}`,

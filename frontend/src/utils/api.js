@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://ems-portal-d033.onrender.com" //backend url
+  baseURL: "" //backend url
 });
 
 API.interceptors.request.use((config) => {
