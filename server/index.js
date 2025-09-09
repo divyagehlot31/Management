@@ -1,4 +1,3 @@
-// server.js
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -11,17 +10,23 @@ import paySalaryRoutes from "./routes/PaySalaryRoutes.js";
 import leaveRoutes from "./routes/leaveRoutes.js";
 
 dotenv.config();
-connectToDatabase()
+connectToDatabase();
 
 const app = express();
-app.use(cors());
+
+// ✅ CORS config
+app.use(cors({
+  origin: ["https://frontend-opze.onrender.com"], // tumhara frontend URL
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // Routes
-app.use('/api/auth', authRouter)
+app.use('/api/auth', authRouter);
 app.use("/api/departments", departmentRoutes);
-
-app.use("/api/employees", employeeRoutes); // Add this
+app.use("/api/employees", employeeRoutes);
 app.use("/api/salaries", salaryRoutes);
 app.use("/api/paysalary", paySalaryRoutes);
 app.use("/api/leaves", leaveRoutes);
