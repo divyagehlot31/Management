@@ -1,6 +1,7 @@
 // components/DepartmentSelect.js
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
+import API from "../utils/api";
 
 const DepartmentSelect = ({ value, onChange, className = "", disabled = false }) => {
   const [departments, setDepartments] = useState([]);
@@ -18,8 +19,9 @@ const DepartmentSelect = ({ value, onChange, className = "", disabled = false })
       const token = localStorage.getItem("token");
       
       // ✅ FIXED: Use the correct endpoint for departments
-      const response = await axios.get(
-        "http://localhost:5000/api/departments", 
+      const response = await API.get(
+        "/departments",
+        // "http://localhost:5000/api/departments", 
         {
         headers: {
           Authorization: `Bearer ${token}`,

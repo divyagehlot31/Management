@@ -1,6 +1,8 @@
 // components/EditDepartmentModal.jsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import API from '../utils/api';
+// import axios from 'axios';
+
 
 const EditDepartmentModal = ({ department, isOpen, onClose, onDepartmentUpdated }) => {
   const [formData, setFormData] = useState({
@@ -29,7 +31,9 @@ isActive: department.isActive !== false // default true
   const fetchAvailableHeads = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/api/departments/available-heads", {
+            const response = await API.get("/departments/available-heads", {
+
+      // const response = await axios.get("http://localhost:5000/api/departments/available-heads", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -93,9 +97,9 @@ isActive: department.isActive !== false // default true
   isActive: formData.isActive,  // 
 };
 
+      const response = await API.put(`/departments/${department._id}`,
 
-      const response = await axios.put(
-        `http://localhost:5000/api/departments/${department._id}`,
+      // const response = await axios.put(`http://localhost:5000/api/departments/${department._id}`,
         submitData,
         {
           headers: {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import API from "../utils/api";
+// import axios from "axios";
 
 const ViewDepartmentModal = ({ isOpen, onClose, departmentId }) => {
   const [department, setDepartment] = useState(null);
@@ -18,8 +19,9 @@ const ViewDepartmentModal = ({ isOpen, onClose, departmentId }) => {
       setError(null);
       
       const token = localStorage.getItem("token");
-      const response = await axios.get(
-        `http://localhost:5000/api/departments/${departmentId}`,
+            const response = await API.get(`/departments/${departmentId}`,
+
+      // const response = await axios.get(`http://localhost:5000/api/departments/${departmentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

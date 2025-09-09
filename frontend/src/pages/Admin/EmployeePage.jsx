@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
+import API from "../../utils/api"
 import { useAuth } from "../../context/authContext";
 import ViewEmployeeModal from "../../components/ViewEmployeeModal";
 import EditEmployeeModal from "../../components/EditEmployeeModal"
@@ -25,7 +26,9 @@ const EmployeePage = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/api/employees", {
+            const response = await API.get("/employees", {
+
+      // const response = await axios.get("http://localhost:5000/api/employees", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -47,7 +50,9 @@ const EmployeePage = () => {
   const handleView = async (employeeId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(`http://localhost:5000/api/employees/${employeeId}`, {
+            const response = await API.get(`/employees/${employeeId}`, {
+
+      // const response = await axios.get(`http://localhost:5000/api/employees/${employeeId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -67,7 +72,9 @@ const EmployeePage = () => {
   const handleEdit = async (employeeId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(`http://localhost:5000/api/employees/${employeeId}`, {
+            const response = await API.get(`/employees/${employeeId}`, {
+
+      // const response = await axios.get(`http://localhost:5000/api/employees/${employeeId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -115,7 +122,9 @@ const handleEmployeeUpdated = (updatedEmployee) => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.delete(`http://localhost:5000/api/employees/${id}`, {
+            const response = await API.delete(`/employees/${id}`, {
+
+      // const response = await axios.delete(`http://localhost:5000/api/employees/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

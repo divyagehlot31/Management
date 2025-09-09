@@ -1,6 +1,7 @@
 // src/pages/employee/LeaveHistory.jsx
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
+import API from "../../utils/api";
 import { Calendar, Clock, MessageSquare, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 
 const LeaveHistory = () => {
@@ -16,7 +17,9 @@ const LeaveHistory = () => {
   const fetchLeaves = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/leaves/my-leaves", {
+            const res = await API.get("/leaves/my-leaves", {
+
+      // const res = await axios.get("http://localhost:5000/api/leaves/my-leaves", {
         headers: { Authorization: `Bearer ${token}` },
       });
 

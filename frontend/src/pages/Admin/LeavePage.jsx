@@ -1,6 +1,8 @@
 // src/pages/admin/LeaveManagement.jsx
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
+import API from "../../utils/api"
+
 import { 
   Calendar, 
   CheckCircle, 
@@ -31,10 +33,12 @@ const LeavePage = () => {
     try {
       const token = localStorage.getItem("token");
       const url = filter === "all" 
-        ? "http://localhost:5000/api/leaves/all"
-        : `http://localhost:5000/api/leaves/all?status=${filter}`;
+              ? "/leaves/all"
+        : `/leaves/all?status=${filter}`;
+        // ? "http://localhost:5000/api/leaves/all"
+        // : `http://localhost:5000/api/leaves/all?status=${filter}`;
       
-      const res = await axios.get(url, {
+      const res = await API.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -52,8 +56,9 @@ const LeavePage = () => {
     setActionLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.put(
-        `http://localhost:5000/api/leaves/update/${leaveId}`,
+            const res = await API.put(`/leaves/update/${leaveId}`,
+              
+      // const res = await axios.put(`http://localhost:5000/api/leaves/update/${leaveId}`,
         {
           status,
           adminComments: adminComments.trim() || undefined,

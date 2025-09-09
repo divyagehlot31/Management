@@ -1,6 +1,8 @@
 // src/pages/PaySalaryPage.js
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+// import axios from "axios";
+import API from "../../utils/api"
+
 
 const PaySalaryPage = () => {
   const [employees, setEmployees] = useState([]);
@@ -18,8 +20,10 @@ const PaySalaryPage = () => {
   // Fetch employees
 useEffect(() => {
   const token = localStorage.getItem("token");
-  axios
-    .get("http://localhost:5000/api/employees", {
+    API.get("/employees", {
+
+  // axios.get("http://localhost:5000/api/employees", {
+
       headers: { Authorization: `Bearer ${token}` },
     })
     .then((res) => setEmployees(res.data.employees))
@@ -68,7 +72,9 @@ useEffect(() => {
     setMessage("");
 
     try {
-      await axios.post("http://localhost:5000/api/paysalary", {
+            await API.post("/paysalary", {
+
+      // await axios.post("http://localhost:5000/api/paysalary", {
         employeeId: selectedEmployee._id,
         salary: formData.salary,
         allowance: formData.allowance,
