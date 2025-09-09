@@ -42,38 +42,75 @@ const ApplyLeave = () => {
     setSuccess(null);
   };
 
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
+  e.preventDefault();
+  setLoading(true);
+  setError(null);
+  setSuccess(null);
 
-    try {
-      const token = localStorage.getItem("token");
-            const res = await API.post("/leaves/apply",
+  try {
+    const token = localStorage.getItem("token");
 
-      // const res = await axios.post("http://localhost:5000/api/leaves/apply",
-        formData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+    // ✅ include totalDays
+    const payload = {
+      ...formData,
+      totalDays, 
+    };
 
-      if (res.data.success) {
-        setSuccess("Leave application submitted successfully!");
-        setFormData({
-          leaveType: "",
-          startDate: "",
-          endDate: "",
-          reason: "",
-        });
-      }
-    } catch (err) {
-      setError(err.response?.data?.error || "Failed to submit leave application");
-    } finally {
-      setLoading(false);
+    const res = await API.post("/leaves/apply", payload, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (res.data.success) {
+      setSuccess("Leave application submitted successfully!");
+      setFormData({
+        leaveType: "",
+        startDate: "",
+        endDate: "",
+        reason: "",
+      });
     }
-  };
+  } catch (err) {
+    setError(err.response?.data?.error || "Failed to submit leave application");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   setError(null);
+  //   setSuccess(null);
+
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //           const res = await API.post("/leaves/apply",
+
+  //     // const res = await axios.post("http://localhost:5000/api/leaves/apply",
+  //       formData,
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       }
+  //     );
+
+  //     if (res.data.success) {
+  //       setSuccess("Leave application submitted successfully!");
+  //       setFormData({
+  //         leaveType: "",
+  //         startDate: "",
+  //         endDate: "",
+  //         reason: "",
+  //       });
+  //     }
+  //   } catch (err) {
+  //     setError(err.response?.data?.error || "Failed to submit leave application");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <div className="max-w-2xl mx-auto">
