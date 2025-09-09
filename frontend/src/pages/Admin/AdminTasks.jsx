@@ -1,18 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { 
-  Plus, 
-  Search, 
-  Filter, 
-  Edit3, 
-  Trash2, 
-  Eye, 
-  Calendar, 
-  User, 
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  XCircle,
-  MessageSquare
+  Plus, Search, Filter, Edit3, Trash2, Eye, Calendar, User, AlertCircle,
+  CheckCircle, Clock, XCircle, MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../../context/authContext';
 
@@ -39,7 +29,6 @@ const AdminTask = () => {
     cancelled: 0
   });
 
-  // Create task form states
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -50,55 +39,50 @@ const AdminTask = () => {
   });
   const [newComment, setNewComment] = useState('');
 
+  const token = localStorage.getItem('token');
+  const axiosConfig = { headers: { Authorization: `Bearer ${token}` } };
+
   useEffect(() => {
     fetchTasks();
     fetchEmployees();
     fetchStats();
   }, [filters]);
 
+  // Fetch Tasks
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const queryParams = new URLSearchParams();
-      
+      const params = {};
       Object.entries(filters).forEach(([key, value]) => {
-        if (value && key !== 'search') queryParams.append(key, value);
+        if (value && key !== 'search') params[key] = value;
       });
 
-      const response = await fetch(`/api/task?${queryParams}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      const data = await response.json();
+      const { data } = await API.get('/api/task', { params, ...axiosConfig });
+
       if (data.success) {
         let filteredTasks = data.tasks;
-        
         if (filters.search) {
           filteredTasks = data.tasks.filter(task =>
             task.title.toLowerCase().includes(filters.search.toLowerCase()) ||
             task.description.toLowerCase().includes(filters.search.toLowerCase())
           );
         }
-        
         setTasks(filteredTasks);
       } else {
         setError(data.error);
       }
     } catch (err) {
+      console.error(err);
       setError('Failed to fetch tasks');
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch Employees
   const fetchEmployees = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/employees', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await response.json();
+      const { data } = await API.get('/employees', axiosConfig);
       if (data.success) {
         setEmployees(data.employees.filter(emp => emp.role === 'employee'));
       }
@@ -107,13 +91,10 @@ const AdminTask = () => {
     }
   };
 
+  // Fetch Stats
   const fetchStats = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/task/stats', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await response.json();
+      const { data } = await API.get('/task/stats', axiosConfig);
       if (data.success) {
         setStats(data.stats);
       }
@@ -122,20 +103,11 @@ const AdminTask = () => {
     }
   };
 
+  // Create Task
   const handleCreateTask = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/task', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
-      });
-
-      const data = await response.json();
+      const { data } = await API.post('/task', formData, axiosConfig);
       if (data.success) {
         setTasks([data.task, ...tasks]);
         setShowCreateModal(false);
@@ -153,21 +125,16 @@ const AdminTask = () => {
         setError(data.error);
       }
     } catch (err) {
+      console.error(err);
       setError('Failed to create task');
     }
   };
 
+  // Delete Task
   const handleDeleteTask = async (taskId) => {
     if (!window.confirm('Are you sure you want to delete this task?')) return;
-    
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/task/${taskId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      const data = await response.json();
+      const { data } = await API.delete(`/task/${taskId}`, axiosConfig);
       if (data.success) {
         setTasks(tasks.filter(task => task._id !== taskId));
         fetchStats();
@@ -176,18 +143,15 @@ const AdminTask = () => {
         setError(data.error);
       }
     } catch (err) {
+      console.error(err);
       setError('Failed to delete task');
     }
   };
 
+  // View Task
   const handleViewTask = async (taskId) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/task/${taskId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      const data = await response.json();
+      const { data } = await API.get(`/task/${taskId}`, axiosConfig);
       if (data.success) {
         setSelectedTask(data.task);
         setShowViewModal(true);
@@ -195,26 +159,21 @@ const AdminTask = () => {
         setError(data.error);
       }
     } catch (err) {
+      console.error(err);
       setError('Failed to fetch task details');
     }
   };
 
+  // Add Comment
   const handleAddComment = async (e) => {
     e.preventDefault();
     if (!newComment.trim() || !selectedTask) return;
-
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/task/${selectedTask._id}/comments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ message: newComment })
-      });
-
-      const data = await response.json();
+      const { data } = await API.post(
+        `/task/${selectedTask._id}/comments`,
+        { message: newComment },
+        axiosConfig
+      );
       if (data.success) {
         setSelectedTask(data.task);
         setNewComment('');
@@ -222,10 +181,12 @@ const AdminTask = () => {
         setError(data.error);
       }
     } catch (err) {
+      console.error(err);
       setError('Failed to add comment');
     }
   };
 
+  // Status & Priority Colors
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending': return 'text-yellow-600 bg-yellow-100';
@@ -246,21 +207,9 @@ const AdminTask = () => {
     }
   };
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+  const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
-      </div>
-    );
-  }
+  if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div></div>;
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
