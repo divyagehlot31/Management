@@ -50,6 +50,8 @@ export const applyLeave = async (req, res) => {
       startDate: start,
       endDate: end,
       reason: reason.trim(),
+        totalDays: Math.ceil((end - start) / (1000 * 3600 * 24)) + 1, // ✅ yaha set kar do
+
     });
 
     await leave.save();

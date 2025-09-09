@@ -23,7 +23,7 @@ const leaveSchema = new mongoose.Schema(
     },
     totalDays: {
       type: Number,
-      required: true,
+      // required: true,
     },
     reason: {
       type: String,
