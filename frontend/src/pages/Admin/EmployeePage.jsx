@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import API from "../../utils/api"
 import { useAuth } from "../../context/authContext";
 import ViewEmployeeModal from "../../components/ViewEmployeeModal";
-import EditEmployeeModal from "../../components/EditEmployeeModal"
+import EditEmployeeModal from "../../components/EditEmployeeModal";
+import AddEmployeeModal from "../../components/AddEmployeeModal";
 
 const EmployeePage = () => {
   const [searchId, setSearchId] = useState("");
@@ -11,6 +12,8 @@ const EmployeePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user } = useAuth();
+  const [addModalOpen, setAddModalOpen] = useState(false);
+
 
   // Modal states
   const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -210,7 +213,13 @@ const getDepartmentName = (department) => {
 
       {/* Search Bar */}
       <div className="flex mb-6 justify-between items-center">
-        <div></div> {/* Empty div for spacing */}
+        <div><button
+  onClick={() => setAddModalOpen(true)}
+  className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 mb-4"
+>
+  + Add New Employee
+</button>
+</div> {/* Empty div for spacing */}
         
         <input
           type="text"
@@ -358,6 +367,12 @@ const getDepartmentName = (department) => {
         }}
         onEmployeeUpdated={handleEmployeeUpdated}
       />
+      <AddEmployeeModal
+  isOpen={addModalOpen}
+  onClose={() => setAddModalOpen(false)}
+  onEmployeeAdded={(employee) => setEmployees(prev => [employee, ...prev])}
+/>
+
     </div>
   );
 };

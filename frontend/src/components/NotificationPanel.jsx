@@ -98,6 +98,7 @@ const NotificationPanel = ({ isOpen, onClose }) => {
       case "task_assigned":
       case "task_updated":
       case "task_completed":
+      
         return <Calendar className="h-4 w-4 text-blue-600" />;
       case "message":
         return <MessageCircle className="h-4 w-4 text-green-600" />;
