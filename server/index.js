@@ -9,6 +9,7 @@ import salaryRoutes from "./routes/salaryRoutes.js";
 import paySalaryRoutes from "./routes/PaySalaryRoutes.js";
 import leaveRoutes from "./routes/leaveRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js"
+import notificationRoutes from "./routes/notificationRoutes.js"
 
 dotenv.config();
 connectToDatabase();
@@ -32,6 +33,8 @@ app.use("/api/salaries", salaryRoutes);
 app.use("/api/paysalary", paySalaryRoutes);
 app.use("/api/leaves", leaveRoutes);
 app.use("/api/task", taskRoutes);
+app.use("/api/notifications", notificationRoutes);
+
 
 
 console.log("Server starting...");
