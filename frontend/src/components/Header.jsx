@@ -1,6 +1,6 @@
 import React from "react";
 import { useAuth } from "../context/authContext";
-import { NotificationBell } from "./NotificationPanel";
+import { NotificationBell } from "./NotificationPanel.jsx";
 import { LogOut, User } from "lucide-react";
 
 const Header = () => {
