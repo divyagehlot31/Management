@@ -16,7 +16,7 @@ const router = express.Router();
 router.get("/departments", verifyUser, getDepartmentsForEmployees);
 
 // Employee management routes
-import { addEmployee } from "../controllers/employeeController.js";
+// import { addEmployee } from "../controllers/employeeController.js";
 
 // Add new employee (Admin only)
 router.post("/", verifyUser, isAdmin, addEmployee);
