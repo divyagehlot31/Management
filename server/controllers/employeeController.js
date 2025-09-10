@@ -2,36 +2,32 @@
 import User from "../models/User.js";
 import Department from "../models/Department.js";
 
-// Add new employee
+import bcrypt from "bcrypt";
+// import User from "../models/User.js";
+
+// Add new employee (Admin)
 export const addEmployee = async (req, res) => {
   try {
-    const { name, email, password, phone, dateOfBirth, department, salary } = req.body;
+    const { name, email, password, phone, department, dateOfBirth, salary } = req.body;
 
-    // Check required fields
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        error: "Name, Email, and Password are required",
-      });
-    }
-
-    // Check if email already exists
+    // Check if email exists
     const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        error: "Email already exists",
-      });
-    }
+    if (existingUser) return res.status(400).json({ success: false, error: "Email already exists" });
+
+    // If password not provided, set default password
+    const plainPassword = password || "Default@123";
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
     const newEmployee = new User({
       name,
       email,
-      password, // You might want to hash it
+      password: hashedPassword,
       role: "employee",
       phone,
-      dateOfBirth,
       department,
+      dateOfBirth,
       salary,
     });
 
@@ -39,17 +35,23 @@ export const addEmployee = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      employee: newEmployee,
-      message: "Employee added successfully",
+      employee: {
+        _id: newEmployee._id,
+        name: newEmployee.name,
+        email: newEmployee.email,
+        phone: newEmployee.phone,
+        department: newEmployee.department,
+        dateOfBirth: newEmployee.dateOfBirth,
+        salary: newEmployee.salary,
+      },
+      message: `Employee added successfully. Default password: ${plainPassword}`,
     });
   } catch (error) {
     console.error("Add employee error:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to add employee",
-    });
+    res.status(500).json({ success: false, error: "Failed to add employee" });
   }
 };
+
 
 
 // Get all employees
