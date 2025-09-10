@@ -1,467 +1,228 @@
 import React, { useState, useEffect } from "react";
+// import axios from "axios";
 import API from "../../utils/api";
-import { useAuth } from "../../context/authContext";
-import { Calendar, Clock, AlertCircle, CheckCircle, MessageCircle, Send, X } from "lucide-react";
 
-const EmployeeTask = () => {
-  const { user } = useAuth();
+const EmployeeTasks = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  
-  // Filter states
   const [statusFilter, setStatusFilter] = useState("");
-  
-  // Modal states
-  const [showTaskModal, setShowTaskModal] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [newComment, setNewComment] = useState("");
-  const [submissionNote, setSubmissionNote] = useState("");
+  const [commentText, setCommentText] = useState({});
+  const [submissionNote, setSubmissionNote] = useState({});
+  const [submissionFiles, setSubmissionFiles] = useState({});
+  const [error, setError] = useState("");
 
-  // Task statistics
-  const [stats, setStats] = useState({
-    total: 0,
-    pending: 0,
-    in_progress: 0,
-    completed: 0
-  });
+  const token = localStorage.getItem("token"); // JWT token
 
-  useEffect(() => {
-    fetchTasks();
-    fetchTaskStats();
-  }, []);
-
+  // Fetch tasks
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
-      const response = await API.get("/tasks", {
+      const query = statusFilter ? `?status=${statusFilter}` : "";
+      const res = await API.get(`/task${query}`, {
         headers: { Authorization: `Bearer ${token}` },
-        params: statusFilter ? { status: statusFilter } : {}
       });
-
-      if (response.data.success) {
-        setTasks(response.data.tasks);
-      }
-    } catch (error) {
-      console.error("Error fetching tasks:", error);
+      setTasks(res.data.tasks);
+      setLoading(false);
+    } catch (err) {
+      console.error(err);
       setError("Failed to fetch tasks");
-    } finally {
       setLoading(false);
     }
   };
 
-  const fetchTaskStats = async () => {
+  useEffect(() => {
+    fetchTasks();
+  }, [statusFilter]);
+
+  // Update task status
+  const handleStatusChange = async (taskId, newStatus) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await API.get("/tasks/stats", {
+      const res = await API.put(`/task/${taskId}`, { status: newStatus }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
-      if (response.data.success) {
-        setStats(response.data.stats);
-      }
-    } catch (error) {
-      console.error("Error fetching task stats:", error);
+      setTasks(tasks.map(task => task._id === taskId ? res.data.task : task));
+    } catch (err) {
+      console.error(err);
+      setError("Failed to update status");
     }
   };
 
-  const handleTaskClick = async (taskId) => {
+  // Add comment
+  const handleAddComment = async (taskId) => {
+    if (!commentText[taskId] || commentText[taskId].trim() === "") return;
     try {
-      const token = localStorage.getItem("token");
-      const response = await API.get(`/tasks/${taskId}`, {
+      const res = await API.post(`/task/${taskId}/comments`, { message: commentText[taskId] }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
-      if (response.data.success) {
-        setSelectedTask(response.data.task);
-        setSubmissionNote(response.data.task.submissionNote || "");
-        setShowTaskModal(true);
-      }
-    } catch (error) {
-      console.error("Error fetching task details:", error);
-      setError("Failed to load task details");
-    }
-  };
-
-  const handleStatusUpdate = async (taskId, newStatus) => {
-    try {
-      const token = localStorage.getItem("token");
-      const updateData = { status: newStatus };
-      
-      if (newStatus === "completed" && submissionNote) {
-        updateData.submissionNote = submissionNote;
-      }
-
-      const response = await API.put(`/tasks/${taskId}`, updateData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (response.data.success) {
-        setSuccess(`Task status updated to ${newStatus.replace('_', ' ')}`);
-        fetchTasks();
-        fetchTaskStats();
-        setSelectedTask(response.data.task);
-      }
-    } catch (error) {
-      console.error("Error updating task status:", error);
-      setError("Failed to update task status");
-    }
-  };
-
-  const handleAddComment = async () => {
-    if (!newComment.trim()) return;
-
-    try {
-      const token = localStorage.getItem("token");
-      const response = await API.post(`/tasks/${selectedTask._id}/comments`, {
-        message: newComment
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (response.data.success) {
-        setSuccess("Comment added successfully");
-        setSelectedTask(response.data.task);
-        setNewComment("");
-      }
-    } catch (error) {
-      console.error("Error adding comment:", error);
+      setTasks(tasks.map(task => task._id === taskId ? res.data.task : task));
+      setCommentText({ ...commentText, [taskId]: "" });
+    } catch (err) {
+      console.error(err);
       setError("Failed to add comment");
     }
   };
 
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case "urgent": return "bg-red-100 text-red-800";
-      case "high": return "bg-orange-100 text-orange-800";
-      case "medium": return "bg-yellow-100 text-yellow-800";
-      case "low": return "bg-green-100 text-green-800";
-      default: return "bg-gray-100 text-gray-800";
+  // Submit note
+  const handleSubmissionNote = async (taskId) => {
+    if (!submissionNote[taskId] || submissionNote[taskId].trim() === "") return;
+    try {
+      const res = await API.put(`/task/${taskId}`, { submissionNote: submissionNote[taskId] }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTasks(tasks.map(task => task._id === taskId ? res.data.task : task));
+      setSubmissionNote({ ...submissionNote, [taskId]: "" });
+    } catch (err) {
+      console.error(err);
+      setError("Failed to submit note");
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "completed": return "bg-green-100 text-green-800";
-      case "in_progress": return "bg-blue-100 text-blue-800";
-      case "pending": return "bg-gray-100 text-gray-800";
-      case "cancelled": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+  // Upload submission file
+  const handleFileUpload = async (taskId) => {
+    if (!submissionFiles[taskId] || submissionFiles[taskId].length === 0) return;
+    try {
+      const formData = new FormData();
+      Array.from(submissionFiles[taskId]).forEach(file => {
+        formData.append("files", file);
+      });
+
+      const res = await API.put(`/task/${taskId}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      setTasks(tasks.map(task => task._id === taskId ? res.data.task : task));
+      setSubmissionFiles({ ...submissionFiles, [taskId]: null });
+    } catch (err) {
+      console.error(err);
+      setError("Failed to upload file");
     }
   };
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "completed": return <CheckCircle className="h-4 w-4" />;
-      case "in_progress": return <Clock className="h-4 w-4" />;
-      case "pending": return <AlertCircle className="h-4 w-4" />;
-      default: return <AlertCircle className="h-4 w-4" />;
-    }
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric"
-    });
-  };
-
-  const isOverdue = (dueDate, status) => {
-    return status !== "completed" && new Date(dueDate) < new Date();
-  };
-
-  const filteredTasks = statusFilter ? 
-    tasks.filter(task => task.status === statusFilter) : 
-    tasks;
-
-  if (loading) {
-    return (
-      <div className="p-6">
-        <div className="flex justify-center items-center h-64">
-          <div className="text-lg text-gray-600">Loading tasks...</div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">My Tasks</h1>
+      <h1 className="text-2xl font-bold mb-4">My Tasks</h1>
+
+      {error && <p className="text-red-500 mb-2">{error}</p>}
+
+      {/* Status Filter */}
+      <div className="mb-4">
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="border p-2 rounded"
+        >
+          <option value="">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
       </div>
 
-      {/* Alert Messages */}
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          <div className="flex justify-between items-center">
-            <span>{error}</span>
-            <button onClick={() => setError("")}><X className="h-4 w-4" /></button>
-          </div>
-        </div>
-      )}
-      {success && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          <div className="flex justify-between items-center">
-            <span>{success}</span>
-            <button onClick={() => setSuccess("")}><X className="h-4 w-4" /></button>
-          </div>
-        </div>
-      )}
+      {loading ? (
+        <p>Loading tasks...</p>
+      ) : (
+        <div className="space-y-4">
+          {tasks.length === 0 && <p>No tasks assigned</p>}
 
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-blue-100 p-4 rounded-lg">
-          <h3 className="font-semibold text-blue-800">Total Tasks</h3>
-          <p className="text-2xl font-bold text-blue-900">{stats.total}</p>
-        </div>
-        <div className="bg-gray-100 p-4 rounded-lg">
-          <h3 className="font-semibold text-gray-800">Pending</h3>
-          <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
-        </div>
-        <div className="bg-yellow-100 p-4 rounded-lg">
-          <h3 className="font-semibold text-yellow-800">In Progress</h3>
-          <p className="text-2xl font-bold text-yellow-900">{stats.in_progress}</p>
-        </div>
-        <div className="bg-green-100 p-4 rounded-lg">
-          <h3 className="font-semibold text-green-800">Completed</h3>
-          <p className="text-2xl font-bold text-green-900">{stats.completed}</p>
-        </div>
-      </div>
+          {tasks.map(task => (
+            <div key={task._id} className="border p-4 rounded shadow-md bg-white">
+              <h2 className="text-lg font-bold">{task.title}</h2>
+              <p className="text-gray-600">{task.description}</p>
+              <p className="mt-1"><strong>Priority:</strong> {task.priority}</p>
+              <p>
+                <strong>Status:</strong>
+                <select
+                  value={task.status}
+                  onChange={(e) => handleStatusChange(task._id, e.target.value)}
+                  className="ml-2 border p-1 rounded"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </p>
+              <p><strong>Due:</strong> {new Date(task.dueDate).toLocaleDateString()}</p>
 
-      {/* Filter */}
-      <div className="bg-white p-4 rounded-lg shadow mb-6">
-        <div className="flex items-center gap-4">
-          <label className="font-medium text-gray-700">Filter by Status:</label>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500"
-          >
-            <option value="">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="in_progress">In Progress</option>
-            <option value="completed">Completed</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Tasks Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredTasks.map((task) => (
-          <div 
-            key={task._id} 
-            className={`bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow ${
-              isOverdue(task.dueDate, task.status) ? 'border-l-4 border-red-500' : ''
-            }`}
-            onClick={() => handleTaskClick(task._id)}
-          >
-            <div className="flex justify-between items-start mb-3">
-              <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">{task.title}</h3>
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getPriorityColor(task.priority)}`}>
-                {task.priority}
-              </span>
-            </div>
-            
-            <p className="text-gray-600 text-sm mb-4 line-clamp-3">{task.description}</p>
-            
-            <div className="flex items-center justify-between mb-3">
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
-                {getStatusIcon(task.status)}
-                <span className="ml-1 capitalize">{task.status.replace('_', ' ')}</span>
-              </span>
-              
-              {task.category && (
-                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                  {task.category}
-                </span>
-              )}
-            </div>
-            
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center text-gray-500">
-                <Calendar className="h-4 w-4 mr-1" />
-                <span className={isOverdue(task.dueDate, task.status) ? 'text-red-600 font-medium' : ''}>
-                  {formatDate(task.dueDate)}
-                </span>
+              {/* Submission Note */}
+              <div className="mt-2">
+                <textarea
+                  placeholder="Add submission note..."
+                  value={submissionNote[task._id] || ""}
+                  onChange={(e) => setSubmissionNote({ ...submissionNote, [task._id]: e.target.value })}
+                  className="w-full border p-2 rounded"
+                />
+                <button
+                  onClick={() => handleSubmissionNote(task._id)}
+                  className="mt-1 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                >
+                  Submit Note
+                </button>
               </div>
-              
-              <div className="text-gray-400 text-xs">
-                by {task.assignedBy.name}
-              </div>
-            </div>
-            
-            {isOverdue(task.dueDate, task.status) && (
-              <div className="mt-2 text-red-600 text-xs font-medium">
-                Overdue
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
 
-      {filteredTasks.length === 0 && (
-        <div className="text-center py-8">
-          <div className="text-gray-500 text-lg">No tasks found</div>
-          <div className="text-gray-400 text-sm mt-1">
-            {statusFilter ? `No ${statusFilter.replace('_', ' ')} tasks` : "You don't have any tasks assigned yet"}
-          </div>
-        </div>
-      )}
+              {/* Submission Files */}
+              <div className="mt-2">
+                <input
+                  type="file"
+                  multiple
+                  onChange={(e) => setSubmissionFiles({ ...submissionFiles, [task._id]: e.target.files })}
+                  className="border p-1 rounded"
+                />
+                <button
+                  onClick={() => handleFileUpload(task._id)}
+                  className="ml-2 bg-purple-500 text-white px-3 py-1 rounded hover:bg-purple-600"
+                >
+                  Upload File
+                </button>
 
-      {/* Task Detail Modal */}
-      {showTaskModal && selectedTask && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-96 overflow-y-auto">
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">{selectedTask.title}</h2>
-                <p className="text-gray-600 mt-1">Assigned by {selectedTask.assignedBy.name}</p>
-              </div>
-              <button
-                onClick={() => setShowTaskModal(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Left Column - Task Details */}
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold text-gray-700 mb-2">Description</h3>
-                  <p className="text-gray-600">{selectedTask.description}</p>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="font-semibold text-gray-700 mb-1">Priority</h3>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getPriorityColor(selectedTask.priority)}`}>
-                      {selectedTask.priority}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-700 mb-1">Due Date</h3>
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1 text-gray-400" />
-                      <span className={isOverdue(selectedTask.dueDate, selectedTask.status) ? 'text-red-600 font-medium' : 'text-gray-600'}>
-                        {formatDate(selectedTask.dueDate)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                
-                {selectedTask.category && (
-                  <div>
-                    <h3 className="font-semibold text-gray-700 mb-1">Category</h3>
-                    <span className="text-gray-600">{selectedTask.category}</span>
-                  </div>
-                )}
-
-                {/* Task Status Update */}
-                <div>
-                  <h3 className="font-semibold text-gray-700 mb-2">Current Status</h3>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mb-3 ${getStatusColor(selectedTask.status)}`}>
-                    {getStatusIcon(selectedTask.status)}
-                    <span className="ml-1 capitalize">{selectedTask.status.replace('_', ' ')}</span>
-                  </span>
-                  
-                  <div className="flex gap-2 flex-wrap">
-                    {selectedTask.status === "pending" && (
-                      <button
-                        onClick={() => handleStatusUpdate(selectedTask._id, "in_progress")}
-                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-                      >
-                        Start Working
-                      </button>
-                    )}
-                    {selectedTask.status === "in_progress" && (
-                      <button
-                        onClick={() => handleStatusUpdate(selectedTask._id, "completed")}
-                        className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
-                      >
-                        Mark Complete
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Submission Note for Completed Tasks */}
-                {(selectedTask.status === "in_progress" || selectedTask.status === "completed") && (
-                  <div>
-                    <h3 className="font-semibold text-gray-700 mb-2">Submission Note</h3>
-                    <textarea
-                      value={submissionNote}
-                      onChange={(e) => setSubmissionNote(e.target.value)}
-                      placeholder="Add a note about your work completion..."
-                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500"
-                      rows="3"
-                      disabled={selectedTask.status === "completed"}
-                    />
-                    {selectedTask.status === "in_progress" && (
-                      <button
-                        onClick={() => handleStatusUpdate(selectedTask._id, selectedTask.status)}
-                        className="mt-2 px-3 py-1 bg-teal-600 text-white text-sm rounded hover:bg-teal-700"
-                      >
-                        Update Note
-                      </button>
-                    )}
-                  </div>
+                {/* Show uploaded files */}
+                {task.submissionFiles?.length > 0 && (
+                  <ul className="mt-1 list-disc list-inside">
+                    {task.submissionFiles.map(f => (
+                      <li key={f._id}>
+                        <a href={f.fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                          {f.originalName}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </div>
 
-              {/* Right Column - Comments */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-gray-700 flex items-center gap-2">
-                  <MessageCircle className="h-4 w-4" />
-                  Comments ({selectedTask.comments?.length || 0})
-                </h3>
-                
-                {/* Comments List */}
-                <div className="space-y-3 max-h-64 overflow-y-auto bg-gray-50 p-3 rounded-lg">
-                  {selectedTask.comments && selectedTask.comments.length > 0 ? (
-                    selectedTask.comments.map((comment, index) => (
-                      <div key={index} className="bg-white p-3 rounded border">
-                        <div className="flex justify-between items-start mb-1">
-                          <span className="font-medium text-sm text-gray-900">{comment.user.name}</span>
-                          <span className="text-xs text-gray-500">{formatDate(comment.createdAt)}</span>
-                        </div>
-                        <p className="text-gray-700 text-sm">{comment.message}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-500 text-sm text-center py-4">No comments yet</p>
-                  )}
+              {/* Comments */}
+              <div className="mt-2">
+                <h3 className="font-semibold">Comments:</h3>
+                <div className="space-y-1">
+                  {task.comments.map(c => (
+                    <p key={c._id}><strong>{c.user?.name}:</strong> {c.message}</p>
+                  ))}
                 </div>
-                
-                {/* Add Comment */}
-                <div className="space-y-2">
-                  <textarea
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Add a comment..."
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500"
-                    rows="2"
+                <div className="mt-1 flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Add comment..."
+                    value={commentText[task._id] || ""}
+                    onChange={(e) => setCommentText({ ...commentText, [task._id]: e.target.value })}
+                    className="border p-1 rounded flex-1"
                   />
                   <button
-                    onClick={handleAddComment}
-                    disabled={!newComment.trim()}
-                    className="flex items-center gap-1 px-3 py-1 bg-teal-600 text-white text-sm rounded hover:bg-teal-700 disabled:bg-gray-300"
+                    onClick={() => handleAddComment(task._id)}
+                    className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
                   >
-                    <Send className="h-3 w-3" />
-                    Add Comment
+                    Add
                   </button>
                 </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
       )}
     </div>
   );
 };
 
-export default EmployeeTask;
+export default EmployeeTasks;
