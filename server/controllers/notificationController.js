@@ -1,4 +1,4 @@
-/ controllers/notificationController.js
+// controllers/notificationController.js
 
 // Get notifications for user
 export const getNotifications = async (req, res) => {
