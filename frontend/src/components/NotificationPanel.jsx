@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import API from "../../utils/api";
-import { useAuth } from "../../context/authContext";
+import API from "../utils/api";
+import { useAuth } from "../context/authContext";
 import { Bell, X, Check, CheckCheck, Trash2, Calendar, MessageCircle, AlertTriangle } from "lucide-react";
 
 const NotificationPanel = ({ isOpen, onClose }) => {
